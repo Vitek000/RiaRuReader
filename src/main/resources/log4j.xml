@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+    
+    <appender name="Console" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="[%d{ISO8601}]%5p[%t][%x] - (%F:%L) - %m%n"/>
+        </layout>
+    </appender>
+
+
+    <!--<appender name="bugsnag" class="com.eastview.periodicals.utils.BugsnagAppender">-->
+        <!--<param name="Threshold" value="ERROR" />-->
+    <!--</appender>-->
+
+
+    <logger name="org.hibernate">
+        <level value="info" />
+    </logger>
+    <!-- This overcomes the proxy narrow log of hibernate -->
+    <logger name="org.hibernate.engine.StatefulPersistenceContext.ProxyWarnLog">
+        <level value="error" />
+    </logger>
+    <logger name="org.springframework">
+        <level value="warn" />
+    </logger>
+    <logger name="com.eastview.commons.http.filter.GZIPFilter">
+        <level value="info" />
+    </logger>
+    <logger name="org.apache">
+        <level value="info" />
+    </logger>
+    <logger name="httpclient">
+        <level value="info" />        
+    </logger>
+    <logger name="springfox.documentation">
+        <level value="warn" />
+    </logger>
+    
+    <root>
+        <level value="debug"/>
+        <appender-ref ref="Console"/>
+        <appender-ref ref="bugsnag" />
+    </root>
+</log4j:configuration>
