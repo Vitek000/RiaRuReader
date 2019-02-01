@@ -150,7 +150,6 @@ public class RiaUI extends Application {
         allData.addAll(values);
 
         table.setItems(data);
-//        table.getColumns().addAll(titleCol, dateCol, viewsCountCol/*, numberCol*/);
         table.getColumns().addAll(titleCol, dateCol, viewsCountCol);
 
 
@@ -161,11 +160,6 @@ public class RiaUI extends Application {
         vbox.setSpacing(5);
         vbox.setPadding(new Insets(10, 0, 0, 10));
 
-
-        //table.
-//                setStyle("-fx-selection-bar: red; -fx-selection-bar-non-focused: salmon;");
-//        setStyle("-fx-font-weight: bold; -fx-font-size: 20;");
-        //setStyle("-fx-selection-font-size: 20px;");
 
         // Show link in Browser!!!
         table.setRowFactory(tv -> {
@@ -195,15 +189,12 @@ public class RiaUI extends Application {
         Button makeAllReadUnReadBtn = new Button("Make all Read/UnRead");
         addActionOnMakeAllReadUnReadButton(makeAllReadUnReadBtn);
 
-
         // CheckBox hide read News
         CheckBox hideReadNewsChk = new CheckBox("Hide read news");
         addActionOnHideReadNewsChk(hideReadNewsChk);
 
         //
         Label positionInfoLabel = new Label("1 / 111");
-
-
 
 
         // Text for last hours update
@@ -239,9 +230,6 @@ public class RiaUI extends Application {
 
 
                     if (isHideReadArticles) {
-//                        List<RiaArticle> currentData = new ArrayList<>(table.getItems());
-//                        currentData.remove(oldSelection);
-//                        table.setItems(FXCollections.observableArrayList(currentData));
                         table.getItems().remove(oldSelection);
                     }
 
@@ -255,19 +243,10 @@ public class RiaUI extends Application {
         hBox.setSpacing(5);
         hBox.setPadding(new Insets(10, 0, 0, 10));
         hBox.getChildren().addAll(refreshBtn, clearAllBtn, makeAllReadUnReadBtn, hideReadNewsChk, lastHoursUpdateTextField, positionInfoLabel);
-        //hBox.setStyle("-fx-border-color: red;");
-
-//        table.prefHeightProperty().bind(stage.heightProperty());
-        //table.prefWidthProperty().bind(stage.widthProperty());
-
-
-        //scene.getRoot().setStyle("-fx-border-color: red;");
-
         vbox.getChildren().addAll(hBox, titleLabel, table, lastUpdatedLbl);
         //vbox.setStyle("-fx-border-color: red;");
 
         table.setMinHeight(800);
-
 
         ((Group) scene.getRoot()).getChildren().addAll(vbox);
 
@@ -301,8 +280,6 @@ public class RiaUI extends Application {
             table.refresh();
 
         });
-
-
     }
 
 
@@ -407,6 +384,4 @@ public class RiaUI extends Application {
             table.refresh();
         });
     }
-
-
 }
