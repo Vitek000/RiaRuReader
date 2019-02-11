@@ -34,7 +34,7 @@ public class RiaUI extends Application {
     /**
      * count hours for update
      */
-    private int periodUpdateHours = 2; // Default
+    private int periodUpdateHours = 6; // Default
     private TableView<RiaArticle> table = new TableView<>();
     //private final ObservableList<RiaArticle> data = ;
     private List<RiaArticle> allData = new ArrayList<>();
@@ -325,8 +325,8 @@ public class RiaUI extends Application {
 
                 newData.sort((o1, o2) -> {
                     try {
-                        Date date1 = new SimpleDateFormat("yyyyMMdd HH:mm").parse(o1.getDate());
-                        Date date2 = new SimpleDateFormat("yyyyMMdd HH:mm").parse(o2.getDate());
+                        Date date1 = RiaRuPageByPageFromArchiveUrl.getArticleDateFromUI(o1.getDate());
+                        Date date2 = RiaRuPageByPageFromArchiveUrl.getArticleDateFromUI(o2.getDate());
                         return date2.compareTo(date1);
                     } catch (ParseException e1) {
                         e1.printStackTrace();

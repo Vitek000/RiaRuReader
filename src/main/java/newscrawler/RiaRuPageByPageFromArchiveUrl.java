@@ -16,10 +16,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -108,28 +105,33 @@ public class RiaRuPageByPageFromArchiveUrl {
 
         Map<String, RiaArticle> articlesFromTo = getArticlesFromTo(from1, to1);
 
-        boolean needToProcessAgain = true;
-        int iterCount = 0;
+        logger.debug("before SIZE " + articlesFromTo.entrySet().size());
+//        boolean needToProcessAgain = true;
+//        int iterCount = 0;
+//
+//        while(needToProcessAgain) {
+//            iterCount++;
+//            logger.debug("start process filter again!" + "(" + iterCount + ")");
 
-        while(needToProcessAgain) {
-            iterCount++;
-            logger.debug("start process filter again!" + "(" + iterCount + ")");
-            logger.debug("before SIZE " + articlesFromTo.entrySet().size());
-            //FILTER NEWS!!!
-            articlesFromTo.entrySet().removeIf(RiaRuPageByPageFromArchiveUrl::filterBySportNews);
-            logger.debug("after (" + iterCount + ") SIZE " + articlesFromTo.entrySet().size());
+//            //FILTER NEWS!!!
+//            articlesFromTo.entrySet().removeIf(RiaRuPageByPageFromArchiveUrl::filterBySportNews);
+//            logger.debug("after (" + iterCount + ") SIZE " + articlesFromTo.entrySet().size());
+//
+//            // if present of unprocessed
+//            boolean afterIterationNeedToProcessAgain = false;
+//            for (RiaArticle value : articlesFromTo.values()) {
+//                if(value.isNeedToRecheck()) {
+//                    logger.debug("Exists unprocessed - need to recheck" );
+//                    afterIterationNeedToProcessAgain = true;
+//                    break;
+//                }
+//            }
+//            needToProcessAgain = afterIterationNeedToProcessAgain;
+//        }
 
-            // if present of unprocessed
-            boolean afterIterationNeedToProcessAgain = false;
-            for (RiaArticle value : articlesFromTo.values()) {
-                if(value.isNeedToRecheck()) {
-                    logger.debug("Exists unprocessed - need to recheck" );
-                    afterIterationNeedToProcessAgain = true;
-                    break;
-                }
-            }
-            needToProcessAgain = afterIterationNeedToProcessAgain;
-        }
+        articlesFromTo.entrySet().removeIf(RiaRuPageByPageFromArchiveUrl::filterBySportNews);
+
+        logger.debug("after SIZE " + articlesFromTo.entrySet().size());
         return articlesFromTo;
 
 
@@ -146,7 +148,8 @@ public class RiaRuPageByPageFromArchiveUrl {
 
             Map.Entry<String, RiaArticle> lastViaReflection = getLastViaReflection(articlesTo);
             RiaArticle riaArticle = lastViaReflection.getValue();
-            lastArticleDate = new SimpleDateFormat("yyyyMMdd HH:mm").parse(riaArticle.getDate());
+
+            lastArticleDate = getArticleDateFromUI(riaArticle.getDate());
 
             mergeArticles(result, articlesTo);
 
@@ -232,8 +235,8 @@ public class RiaRuPageByPageFromArchiveUrl {
             articles.put(riaArticle.articleLink, riaArticle);
         }
 
-        logger.debug("====");
-        logger.debug(articles.size());
+//        logger.debug("====");
+//        logger.debug(articles.size());
 
         return articles;
 
@@ -265,7 +268,25 @@ public class RiaRuPageByPageFromArchiveUrl {
                         .toInstant());
     }
 
+
     private static boolean filterBySportNews(Map.Entry<String, RiaArticle> entry) {
+        boolean needToRemove = false;
+
+        if(entry.getKey().startsWith("https://rsport.ria.ru")) {
+            needToRemove = true;
+        }
+
+        return needToRemove;
+
+    }
+
+
+    /**
+     * Old method - when obligate to use redirects to know about actual link
+     * @param entry
+     * @return
+     */
+    private static boolean filterBySportNewsOLD(Map.Entry<String, RiaArticle> entry) {
         boolean show = true;
         if (RiaUI.checkRedirects && entry.getValue().isNeedToRecheck()) {
             try {
@@ -284,7 +305,7 @@ public class RiaRuPageByPageFromArchiveUrl {
                     conn.setRequestProperty("User-Agent", USER_AGENT);
 
 
-                    logger.debug("conn.getResponseCode()=" + conn.getResponseCode());
+                    if(conn.getResponseCode() != 200) logger.debug("conn.getResponseCode()=" + conn.getResponseCode());
 
                     switch (conn.getResponseCode()) {
                         case HttpURLConnection.HTTP_MOVED_PERM:
@@ -322,5 +343,24 @@ public class RiaRuPageByPageFromArchiveUrl {
         }
 
         return !show;
+    }
+
+
+    public static Date getArticleDateFromUI(String articleDateStr) throws ParseException {
+
+        Date articleDate;
+        if(articleDateStr.length() == " 16:45".length()) { // it means only time for Today, date is missing
+
+            String[] parsed = articleDateStr.trim().split(":");
+            LocalDateTime localDateTime = LocalDate.now().atTime(Integer.parseInt(parsed[0]), Integer.parseInt(parsed[1]));
+
+            articleDate = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+
+        }
+        else {
+            articleDate = new SimpleDateFormat("yyyyMMdd HH:mm").parse(articleDateStr);
+        }
+
+        return articleDate;
     }
 }
