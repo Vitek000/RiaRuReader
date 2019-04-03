@@ -146,6 +146,9 @@ public class RiaRuPageByPageFromArchiveUrl {
         do {
             Map<String, RiaArticle> articlesTo = getArticlesTo(to);
 
+            if(articlesTo.isEmpty())
+                break;
+
             Map.Entry<String, RiaArticle> lastViaReflection = getLastViaReflection(articlesTo);
             RiaArticle riaArticle = lastViaReflection.getValue();
 
@@ -203,7 +206,11 @@ public class RiaRuPageByPageFromArchiveUrl {
 
 
             if (doc == null) {
-                throw new RuntimeException("Fail.....");
+                //throw new RuntimeException("Fail.....");
+
+                logger.warn("NOTHING FOUND or ERROR - return empty RESULT");
+
+                return new LinkedHashMap<>();
             }
         }
 
